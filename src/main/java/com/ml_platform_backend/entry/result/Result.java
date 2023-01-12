@@ -4,11 +4,11 @@ import lombok.Data;
 
 @Data
 public class Result {
-    private Code code;
+    private int code;
     private Object data;
     private String message;
 
-    public Result(Code code, Object data, String message) {
+    public Result(int code, Object data, String message) {
         this.code = code;
         this.data = data;
         this.message = message;
