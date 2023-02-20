@@ -1,8 +1,10 @@
 package com.ml_platform_backend.controller;
 
+import com.ml_platform_backend.entry.File;
 import com.ml_platform_backend.entry.result.Code;
 import com.ml_platform_backend.entry.result.ResponseEntity;
 import com.ml_platform_backend.service.FileUploadSvc;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,14 +17,25 @@ public class FileUploadController {
     @Autowired
     private FileUploadSvc fileUploadSvc;
 
+    @Data
+    private class respData {
+        private Integer fileId;
+        private String fileName;
+
+        public respData(Integer fileId, String fileName) {
+            this.fileId = fileId;
+            this.fileName = fileName;
+        }
+    }
+
     @PostMapping("/upload")
     public ResponseEntity uploadFile(@RequestParam(value = "file") MultipartFile file) {
         if (file.isEmpty()) {
             return new ResponseEntity(Code.UPLOAD_ERR.getValue(), null, "文件为空");
         }
-        boolean success = fileUploadSvc.handleFileUpload(file);
-        if (success) {
-            return new ResponseEntity(Code.UPLOAD_OK.getValue(), null, Code.UPLOAD_OK.getDescription());
+        File savedFile = fileUploadSvc.handleFileUpload(file);
+        if (savedFile != null) {
+            return new ResponseEntity(Code.UPLOAD_OK.getValue(), new respData(savedFile.getId(), savedFile.getFileName()), Code.UPLOAD_OK.getDescription());
         }
         return new ResponseEntity(Code.UPLOAD_ERR.getValue(), null, Code.UPLOAD_ERR.getDescription());
     }
