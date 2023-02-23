@@ -1,9 +1,11 @@
 package com.ml_platform_backend.entry.result;
 
 public enum Code {
+    SUCCESS(20000, "操作成功"),
+    FAILED(20001, "操作失败"),
     UPLOAD_OK(20050, "数据源上传成功"),
 
-    UPLOAD_ERR(20051,"数据源上传失败");
+    UPLOAD_ERR(20051, "数据源上传失败");
 
     private final int value;
     private final String description;

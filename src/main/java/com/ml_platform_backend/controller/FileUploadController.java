@@ -6,10 +6,13 @@ import com.ml_platform_backend.entry.result.ResponseEntity;
 import com.ml_platform_backend.service.FileUploadSvc;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 
 @RestController
@@ -26,6 +29,11 @@ public class FileUploadController {
             this.fileId = fileId;
             this.fileName = fileName;
         }
+    }
+
+    @ExceptionHandler({MultipartException.class, MissingServletRequestPartException.class})
+    public ResponseEntity handleMultipartException() {
+        return new ResponseEntity(Code.UPLOAD_ERR.getValue(), null, "上传文件为空");
     }
 
     @PostMapping("/upload")
