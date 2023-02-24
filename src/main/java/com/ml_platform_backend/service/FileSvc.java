@@ -22,4 +22,8 @@ public class FileSvc {
         queryWrapper.eq("is_pre", 1);
         return fileMapper.selectList(queryWrapper);
     }
+
+    public void insertFile(File file) {
+        fileMapper.insert(file);
+    }
 }

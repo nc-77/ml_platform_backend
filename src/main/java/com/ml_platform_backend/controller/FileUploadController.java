@@ -4,6 +4,7 @@ import com.ml_platform_backend.entry.File;
 import com.ml_platform_backend.entry.result.Code;
 import com.ml_platform_backend.entry.result.ResponseEntity;
 import com.ml_platform_backend.service.FileUploadSvc;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,14 +22,10 @@ public class FileUploadController {
     private FileUploadSvc fileUploadSvc;
 
     @Data
+    @AllArgsConstructor
     private class respData {
         private Integer fileId;
         private String fileName;
-
-        public respData(Integer fileId, String fileName) {
-            this.fileId = fileId;
-            this.fileName = fileName;
-        }
     }
 
     @ExceptionHandler({MultipartException.class, MissingServletRequestPartException.class})
