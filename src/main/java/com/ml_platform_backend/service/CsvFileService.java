@@ -3,7 +3,6 @@ package com.ml_platform_backend.service;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
-import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 @Service
-@AllArgsConstructor
-public class CsvFileSvc {
+public class CsvFileService {
 
     public List<String[]> readCsv(String filePath) throws IOException, CsvValidationException {
         List<String[]> data = new ArrayList<>();

@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Service
-public class FileUploadSvc {
+public class FileUploadService {
     @Autowired
     private FileMapper fileMapper;
 

@@ -3,7 +3,7 @@ package com.ml_platform_backend.controller;
 import com.ml_platform_backend.entry.File;
 import com.ml_platform_backend.entry.result.Code;
 import com.ml_platform_backend.entry.result.ResponseEntity;
-import com.ml_platform_backend.service.FileUploadSvc;
+import com.ml_platform_backend.service.FileUploadService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 @RestController
 public class FileUploadController {
     @Autowired
-    private FileUploadSvc fileUploadSvc;
+    private FileUploadService fileUploadService;
 
     @Data
     @AllArgsConstructor
@@ -38,7 +38,7 @@ public class FileUploadController {
         if (file.isEmpty()) {
             return new ResponseEntity(Code.UPLOAD_ERR.getValue(), null, "文件为空");
         }
-        File savedFile = fileUploadSvc.handleFileUpload(file);
+        File savedFile = fileUploadService.handleFileUpload(file);
         if (savedFile != null) {
             return new ResponseEntity(Code.UPLOAD_OK.getValue(), new respData(savedFile.getId(), savedFile.getFileName()), Code.UPLOAD_OK.getDescription());
         }
