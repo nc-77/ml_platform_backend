@@ -16,8 +16,7 @@ import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,7 +80,7 @@ public class LinearService {
         String modelName = utils.getBaseName(dataSource.getFileName());
         String currentDirectory = System.getProperty("user.dir");
         String modelPath = currentDirectory + "/models/" + modelName;
-        Model modelEntry = new Model(modelName, modelPath);
+        Model modelEntry = new Model(modelName, modelPath, model.getClass().toString());
 
         // Serialize model to file
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(modelEntry.getModelPath()));
@@ -94,5 +93,13 @@ public class LinearService {
             return null;
         }
         return modelEntry;
+    }
+
+    public LinearRegression getLinearModel(Model model) throws IOException, ClassNotFoundException {
+        // Deserialize model from file
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(model.getModelPath()));
+        LinearRegression linearModel = (LinearRegression) ois.readObject();
+        ois.close();
+        return linearModel;
     }
 }

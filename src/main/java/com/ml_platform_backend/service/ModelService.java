@@ -13,4 +13,8 @@ public class ModelService {
     public Integer insertModel(Model model) {
         return modelMapper.insert(model);
     }
+
+    public Model getModelById(Integer id) {
+        return modelMapper.selectById(id);
+    }
 }

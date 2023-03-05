@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class Model extends BaseEntity {
     private String modelName;
     private String modelPath;
+    private String modelClass;
 }

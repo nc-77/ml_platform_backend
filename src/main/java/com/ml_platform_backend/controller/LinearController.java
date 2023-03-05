@@ -24,7 +24,6 @@ public class LinearController {
     static class LinearRegressionReq {
         private Integer fileId;
         private String classIndex;
-        private String[] removeIndex;
     }
 
     @Data
@@ -37,7 +36,8 @@ public class LinearController {
     @PostMapping("/train/linearRegression")
     public ResponseEntity LinearRegressionTrain(@RequestBody LinearRegressionReq req) throws Exception {
         File dataSource = fileService.getFileById(req.fileId);
-        LinearService.Options options = new LinearService.Options(req.classIndex, req.removeIndex);
+        LinearService.Options options = new LinearService.Options();
+        options.setClassIndex(req.classIndex);
         linearService.setOptions(options);
         Model model = linearService.LinearRegressionTrain(dataSource);
         return new ResponseEntity(Code.SUCCESS.getValue(), new LinearRegressionResp(model.getId(), model.getModelName()), Code.SUCCESS.getDescription());
