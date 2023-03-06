@@ -22,9 +22,9 @@ class MlPlatformBackendApplicationTests {
     private PredictService predictService;
 
     @Test
-    void TestLinearService() throws Exception {
+    void TestLinearServiceTrain() throws Exception {
         File dataSource = fileService.getFileById(1825833034);
-        linearService.LinearRegressionTrain(dataSource);
+        linearService.train(dataSource);
     }
 
     @Test
@@ -32,5 +32,13 @@ class MlPlatformBackendApplicationTests {
         Model model = modelService.getModelById(1825833047);
         File testDataSet = fileService.getFileById(1825833035);
         predictService.predictLinearModel(model, testDataSet);
+    }
+
+    @Test
+    void TestLinearServiceEvalModel() throws Exception {
+        Model model = modelService.getModelById(1825833054);
+        File train = fileService.getFileById(1825833052);
+        File test = fileService.getFileById(1825833053);
+        linearService.evalModel(model, train, test);
     }
 }

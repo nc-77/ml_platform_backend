@@ -21,6 +21,10 @@ public class FileService {
         return fileMapper.selectById(id);
     }
 
+    public File getTestFile(Integer trainFileId) {
+        return fileMapper.selectById(trainFileId + 1);
+    }
+
     public List<File> getAllPredFiles() {
         QueryWrapper<File> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("is_pre", 1);

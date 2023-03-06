@@ -2,6 +2,7 @@ package com.ml_platform_backend.service;
 
 import com.ml_platform_backend.entry.File;
 import com.ml_platform_backend.entry.Model;
+import com.ml_platform_backend.entry.PredictedFile;
 import com.ml_platform_backend.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,8 @@ import weka.core.converters.ConverterUtils.DataSource;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Service
 public class PredictService {
@@ -19,9 +22,9 @@ public class PredictService {
     @Autowired
     private LinearService linearService;
     @Autowired
-    private FileService fileService;
+    private PredictedFileService predictedFileService;
 
-    public File predictLinearModel(Model model, File testDataSet) throws Exception {
+    public PredictedFile predictLinearModel(Model model, File testDataSet) throws Exception {
         LinearRegression linearModel = linearService.getLinearModel(model);
         // load unlabeled data
         DataSource source = new DataSource(testDataSet.getFilePath());
@@ -40,17 +43,19 @@ public class PredictService {
         }
 
         // save labeled data to fileSys
-        String savedPath = utils.getBaseName(testDataSet.getFilePath()) + "-predicted.arff";
+        String currentDirectory = System.getProperty("user.dir");
+        String fileName = utils.getBaseName(testDataSet.getFileName()) + "-predicted.arff";
+        Path savedPath = Paths.get(currentDirectory + "/predictedFiles/" + fileName);
         BufferedWriter writer = new BufferedWriter(
-                new FileWriter(savedPath));
+                new FileWriter(savedPath.toString()));
         writer.write(labeled.toString());
         writer.newLine();
         writer.flush();
         writer.close();
 
         // save labeled data to db
-        File labeledFile = new File(utils.getBaseName(testDataSet.getFileName()) + "-predicted", savedPath);
-        fileService.insertFile(labeledFile);
+        PredictedFile labeledFile = new PredictedFile(fileName, savedPath.toString(), model.getId(), testDataSet.getId());
+        predictedFileService.insertPredictedFile(labeledFile);
         return labeledFile;
     }
 }

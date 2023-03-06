@@ -76,8 +76,8 @@ public class FileSplitController {
         Path testSetPath = Paths.get(currentDirectory + "/dataSources/" + testSetName);
 
         // 写入划分文件
-        File trainingSetFile = new File(trainingSetName, trainingSetPath.toString());
-        File testSetFile = new File(testSetName, testSetPath.toString());
+        File trainingSetFile = new File(trainingSetName, trainingSetPath.toString(), orginFile.getId());
+        File testSetFile = new File(testSetName, testSetPath.toString(), orginFile.getId());
         fileService.insertFile(trainingSetFile);
         fileService.insertFile(testSetFile);
 

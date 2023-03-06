@@ -2,6 +2,7 @@ package com.ml_platform_backend.controller;
 
 import com.ml_platform_backend.entry.File;
 import com.ml_platform_backend.entry.Model;
+import com.ml_platform_backend.entry.PredictedFile;
 import com.ml_platform_backend.entry.result.Code;
 import com.ml_platform_backend.entry.result.ResponseEntity;
 import com.ml_platform_backend.service.FileService;
@@ -42,7 +43,7 @@ public class PredictController {
         Model model = modelService.getModelById(req.modelId);
         File testDataSet = fileService.getFileById(req.fileId);
         if (model.getModelClass().equals(LinearRegression.class.toString())) {
-            File labeledFile = predictService.predictLinearModel(model, testDataSet);
+            PredictedFile labeledFile = predictService.predictLinearModel(model, testDataSet);
             return new ResponseEntity(Code.SUCCESS.getValue(), new respData(labeledFile.getId(), labeledFile.getFileName()), Code.SUCCESS.getDescription());
         }
         return new ResponseEntity(Code.FAILED.getValue(), null, Code.FAILED.getDescription());

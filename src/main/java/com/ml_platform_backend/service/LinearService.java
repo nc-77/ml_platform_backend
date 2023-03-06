@@ -1,5 +1,6 @@
 package com.ml_platform_backend.service;
 
+import com.ml_platform_backend.entry.EvalResult;
 import com.ml_platform_backend.entry.File;
 import com.ml_platform_backend.entry.Model;
 import com.ml_platform_backend.mapper.ModelMapper;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
@@ -17,6 +19,8 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +31,8 @@ public class LinearService {
     private Utils utils;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private EvalResultService evalService;
     @Autowired
     private Options options;
 
@@ -45,10 +51,10 @@ public class LinearService {
         private String[] removeIndex;
     }
 
-    public Model LinearRegressionTrain(File dataSource) throws Exception {
+    public Model train(File trainDataSet) throws Exception {
 
         // Load dataset
-        DataSource source = new DataSource(dataSource.getFilePath());
+        DataSource source = new DataSource(trainDataSet.getFilePath());
         Instances data = source.getDataSet();
 
 
@@ -77,10 +83,10 @@ public class LinearService {
         LinearRegression model = new LinearRegression();
         model.buildClassifier(data);
 
-        String modelName = utils.getBaseName(dataSource.getFileName());
+        String modelName = utils.getBaseName(trainDataSet.getFileName());
         String currentDirectory = System.getProperty("user.dir");
-        String modelPath = currentDirectory + "/models/" + modelName;
-        Model modelEntry = new Model(modelName, modelPath, model.getClass().toString());
+        Path modelPath = Paths.get(currentDirectory + "/models/" + modelName);
+        Model modelEntry = new Model(modelName, modelPath.toString(), model.getClass().toString(), trainDataSet.getId());
 
         // Serialize model to file
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(modelEntry.getModelPath()));
@@ -93,6 +99,23 @@ public class LinearService {
             return null;
         }
         return modelEntry;
+    }
+
+    public EvalResult evalModel(Model model, File trainDataSet, File testDataSet) throws Exception {
+        // Load dataset
+        Instances train = new DataSource(trainDataSet.getFilePath()).getDataSet();
+        train.setClassIndex(train.numAttributes() - 1);
+        Instances test = new DataSource(testDataSet.getFilePath()).getDataSet();
+        test.setClassIndex(train.numAttributes() - 1);
+
+        Evaluation eval = new Evaluation(train);
+        LinearRegression linearModel = getLinearModel(model);
+        eval.evaluateModel(linearModel, test);
+
+        // save evalResult to db
+        EvalResult evalResult = new EvalResult(eval.correlationCoefficient(), eval.meanAbsoluteError(), eval.rootMeanSquaredError(), eval.relativeAbsoluteError(), eval.rootRelativeSquaredError(), (int) eval.numInstances());
+        evalService.insert(evalResult);
+        return evalResult;
     }
 
     public LinearRegression getLinearModel(Model model) throws IOException, ClassNotFoundException {
