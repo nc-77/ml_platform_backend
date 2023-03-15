@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.FileNotFoundException;
+
 @SpringBootTest
 class MlPlatformBackendApplicationTests {
     @Autowired
@@ -40,5 +42,11 @@ class MlPlatformBackendApplicationTests {
         File train = fileService.getFileById(1825833052);
         File test = fileService.getFileById(1825833053);
         linearService.evalModel(model, train, test);
+    }
+
+    @Test
+    void TestgetFileJsonContentService() throws FileNotFoundException {
+        String json = fileService.getFileJsonContent(1825832980);
+        System.out.println(json);
     }
 }

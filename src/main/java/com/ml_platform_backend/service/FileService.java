@@ -5,12 +5,13 @@ import com.ml_platform_backend.entry.File;
 import com.ml_platform_backend.mapper.FileMapper;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import org.json.CDL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FileService {
@@ -39,5 +40,12 @@ public class FileService {
         File file = getFileById(id);
         CSVReader csvReader = new CSVReader(new FileReader(file.getFilePath()));
         return csvReader.readNext();
+    }
+
+    public String getFileJsonContent(Integer id) throws FileNotFoundException {
+        File file = getFileById(id);
+        InputStreamReader reader = new InputStreamReader(new FileInputStream(new java.io.File(file.getFilePath())));
+        String csvAsString = new BufferedReader(reader).lines().collect(Collectors.joining("\n"));
+        return CDL.toJSONArray(csvAsString).toString();
     }
 }

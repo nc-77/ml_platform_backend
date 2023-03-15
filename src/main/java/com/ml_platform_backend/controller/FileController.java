@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -28,5 +29,11 @@ public class FileController {
     public ResponseEntity getFileFieldList(@PathVariable Integer id) throws CsvValidationException, IOException {
         String[] fieldList = fileService.getFirstLine(id);
         return new ResponseEntity(Code.SUCCESS.getValue(), fieldList, Code.SUCCESS.getDescription());
+    }
+
+    @GetMapping("/files/{id}/content")
+    public ResponseEntity getFileContent(@PathVariable Integer id) throws FileNotFoundException {
+        String json = fileService.getFileJsonContent(id);
+        return new ResponseEntity(Code.SUCCESS.getValue(), json, Code.SUCCESS.getDescription());
     }
 }
