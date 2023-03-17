@@ -8,13 +8,14 @@ import com.ml_platform_backend.entry.result.ResponseEntity;
 import com.ml_platform_backend.service.FileService;
 import com.ml_platform_backend.service.ModelService;
 import com.ml_platform_backend.service.PredictService;
+import com.ml_platform_backend.service.PredictedFileService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import weka.classifiers.functions.LinearRegression;
+
+import java.util.List;
 
 @RestController
 public class PredictController {
@@ -24,6 +25,9 @@ public class PredictController {
     private FileService fileService;
     @Autowired
     private PredictService predictService;
+
+    @Autowired
+    private PredictedFileService predictedFileService;
 
     @Data
     private static class predictReq {
@@ -48,4 +52,17 @@ public class PredictController {
         }
         return new ResponseEntity(Code.FAILED.getValue(), null, Code.FAILED.getDescription());
     }
+
+    @GetMapping("/predictedFiles/{id}/labelValues")
+    public ResponseEntity getPredictedFileLabelValues(@PathVariable Integer id) {
+        List<Double> labelValues = predictedFileService.getPredictedFileLabelValues(id);
+        return new ResponseEntity(Code.SUCCESS.getValue(), labelValues, Code.SUCCESS.getDescription());
+    }
+
+    @GetMapping("/predictedFiles/{id}/content")
+    public ResponseEntity getPredictedFilesContent(@PathVariable Integer id) {
+        String json = predictedFileService.getFileJsonContent(id);
+        return new ResponseEntity(Code.SUCCESS.getValue(), json, Code.SUCCESS.getDescription());
+    }
+
 }

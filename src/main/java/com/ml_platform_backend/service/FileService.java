@@ -44,7 +44,7 @@ public class FileService {
 
     public String getFileJsonContent(Integer id) throws FileNotFoundException {
         File file = getFileById(id);
-        InputStreamReader reader = new InputStreamReader(new FileInputStream(new java.io.File(file.getFilePath())));
+        InputStreamReader reader = new InputStreamReader(new FileInputStream(file.getFilePath()));
         String csvAsString = new BufferedReader(reader).lines().collect(Collectors.joining("\n"));
         return CDL.toJSONArray(csvAsString).toString();
     }
