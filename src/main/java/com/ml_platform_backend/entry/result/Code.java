@@ -5,8 +5,10 @@ public enum Code {
     FAILED(20001, "操作失败"),
     UPLOAD_OK(20050, "数据源上传成功"),
 
-    UPLOAD_ERR(20051, "数据源上传失败");
+    UPLOAD_ERR(20051, "数据源上传失败"),
 
+    LOGIN_OK(20060, "登陆成功"),
+    LOGIN_ERR(20061, "用户名或密码错误");
     private final int value;
     private final String description;
 
