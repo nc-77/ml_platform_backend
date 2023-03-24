@@ -15,6 +15,15 @@ public class WorkflowController {
     @Autowired
     private WorkflowService workflowService;
 
+    @GetMapping("/workflows/{id}")
+    public ResponseEntity getWorkflowById(@PathVariable Integer id) {
+        Workflow workflow = workflowService.getWorkflowById(id);
+        if (workflow == null) {
+            return new ResponseEntity(Code.FAILED.getValue(), null, Code.FAILED.getDescription());
+        }
+        return new ResponseEntity(Code.SUCCESS.getValue(), workflow, Code.SUCCESS.getDescription());
+    }
+
     @GetMapping("/workflows")
     public ResponseEntity getAllWorkflowsByUser(@RequestParam("userId") Integer userId) {
         List<Workflow> workflows = workflowService.getAllWorkflowsByUser(userId);

@@ -13,6 +13,10 @@ public class WorkflowService {
     @Autowired
     private WorkflowMapper workflowMapper;
 
+    public Workflow getWorkflowById(Integer id) {
+        return workflowMapper.selectById(id);
+    }
+
     // add workflow if it doesn't exist or update workflow
     public int setWorkflow(Workflow workflow) {
         if (workflow.getId() == null) {
