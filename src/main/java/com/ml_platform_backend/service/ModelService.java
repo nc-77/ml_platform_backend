@@ -17,4 +17,6 @@ public class ModelService {
     public Model getModelById(Integer id) {
         return modelMapper.selectById(id);
     }
+
+
 }

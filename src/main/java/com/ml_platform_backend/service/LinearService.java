@@ -83,7 +83,7 @@ public class LinearService {
         LinearRegression model = new LinearRegression();
         model.buildClassifier(data);
 
-        String modelName = utils.getBaseName(trainDataSet.getFileName());
+        String modelName = utils.getBaseName(trainDataSet.getFileName()) + ".model";
         String currentDirectory = System.getProperty("user.dir");
         Path modelPath = Paths.get(currentDirectory + "/models/" + modelName);
         Model modelEntry = new Model(modelName, modelPath.toString(), model.getClass().toString(), trainDataSet.getId());

@@ -12,9 +12,14 @@ import com.ml_platform_backend.service.PredictedFileService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import weka.classifiers.functions.LinearRegression;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 @RestController
@@ -65,4 +70,13 @@ public class PredictController {
         return new ResponseEntity(Code.SUCCESS.getValue(), json, Code.SUCCESS.getDescription());
     }
 
+    @GetMapping("/predictedFiles/download/{id}")
+    public org.springframework.http.ResponseEntity<byte[]> downloadFile(@PathVariable Integer id) throws IOException {
+        PredictedFile file = predictedFileService.getPredictedFileById(id);
+        byte[] data = Files.readAllBytes(Path.of(file.getFilePath()));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        return new org.springframework.http.ResponseEntity<>(data, headers, org.springframework.http.HttpStatus.OK);
+    }
 }
