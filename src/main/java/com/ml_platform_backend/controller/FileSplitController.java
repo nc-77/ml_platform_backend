@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -52,12 +50,6 @@ public class FileSplitController {
     @PostMapping("/files/split")
     public ResponseEntity fileSplit(@RequestBody fileSplitReq req) {
         File orginFile = fileService.getFileById(req.originFileId);
-        // 生成划分文件名
-        String originFileName = orginFile.getFileName();
-        String baseName = utils.getBaseName(originFileName);
-        String suffixName = utils.getSuffixName(originFileName);
-        String trainingSetName = baseName + "-0." + suffixName;
-        String testSetName = baseName + "-1." + suffixName;
 
         List<String[]> fileData = null;
         try {
@@ -70,20 +62,15 @@ public class FileSplitController {
         List<String[]> trainingSet = pair.getLeft();
         List<String[]> testSet = pair.getRight();
 
-        // 生成划分文件路径
-        String currentDirectory = System.getProperty("user.dir");
-        Path trainingSetPath = Paths.get(currentDirectory + "/dataSources/" + trainingSetName);
-        Path testSetPath = Paths.get(currentDirectory + "/dataSources/" + testSetName);
-
         // 写入划分文件
-        File trainingSetFile = new File(trainingSetName, trainingSetPath.toString(), orginFile.getId());
-        File testSetFile = new File(testSetName, testSetPath.toString(), orginFile.getId());
+        File trainingSetFile = fileService.getNewFile(orginFile);
+        File testSetFile = fileService.getNewFile(orginFile);
         fileService.insertFile(trainingSetFile);
         fileService.insertFile(testSetFile);
 
         try {
-            csvFileService.writeCsv(trainingSet, trainingSetPath.toString());
-            csvFileService.writeCsv(testSet, testSetPath.toString());
+            csvFileService.writeCsv(trainingSet, trainingSetFile.getFilePath());
+            csvFileService.writeCsv(testSet, testSetFile.getFilePath());
         } catch (Exception e) {
             e.printStackTrace();
         }

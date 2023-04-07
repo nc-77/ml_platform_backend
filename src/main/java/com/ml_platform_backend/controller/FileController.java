@@ -5,12 +5,12 @@ import com.ml_platform_backend.entry.result.Code;
 import com.ml_platform_backend.entry.result.ResponseEntity;
 import com.ml_platform_backend.service.FileService;
 import com.opencsv.exceptions.CsvValidationException;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,6 +22,19 @@ import java.util.List;
 public class FileController {
     @Autowired
     private FileService fileService;
+
+
+    @Data
+    static class RemoveDuplicatesReq {
+        private Integer fileId;
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class RemoveDuplicatesResp {
+        private Integer fileId;
+        private String fileName;
+    }
 
     @GetMapping("/files/dataSets")
     public ResponseEntity getAllDataSets() {
@@ -50,5 +63,13 @@ public class FileController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         return new org.springframework.http.ResponseEntity<>(data, headers, org.springframework.http.HttpStatus.OK);
+    }
+
+    @PostMapping("/files/removeDuplicates")
+    public ResponseEntity removeDuplicates(@RequestBody RemoveDuplicatesReq req) throws Exception {
+        File file = fileService.getFileById(req.fileId);
+        File savedFile = fileService.removeDuplicate(file);
+
+        return new ResponseEntity(Code.SUCCESS.getValue(), new RemoveDuplicatesResp(savedFile.getId(), savedFile.getFileName()), Code.SUCCESS.getDescription());
     }
 }
