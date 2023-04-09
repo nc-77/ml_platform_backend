@@ -18,6 +18,8 @@ import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 import weka.filters.unsupervised.instance.RemoveDuplicates;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,8 +34,9 @@ public class FileService {
         // 为fileName添加随机后缀
         String fileName = file.getFileName();
         String newFileName = utils.getFileRandomName(fileName);
-        String newFilePath = file.getFilePath().replace(fileName, newFileName);
-        return new File(newFileName, newFilePath, file.getId());
+        Path path = Paths.get(file.getFilePath());
+        Path newFilePath = Paths.get(path.getParent().toString(), newFileName);
+        return new File(newFileName, newFilePath.toString(), file.getId());
     }
 
     public File getFileById(Integer id) {

@@ -7,11 +7,13 @@ import com.ml_platform_backend.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import weka.classifiers.functions.LinearRegression;
+import weka.classifiers.lazy.IBk;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -22,7 +24,18 @@ public class PredictService {
     @Autowired
     private LinearService linearService;
     @Autowired
+    private KNNService knnService;
+    @Autowired
     private PredictedFileService predictedFileService;
+
+    private void savePredictedFileToFileSys(Instances predictedFile, Path filePath) throws IOException {
+        BufferedWriter writer = new BufferedWriter(
+                new FileWriter(filePath.toString()));
+        writer.write(predictedFile.toString());
+        writer.newLine();
+        writer.flush();
+        writer.close();
+    }
 
     public PredictedFile predictLinearModel(Model model, File testDataSet) throws Exception {
         LinearRegression linearModel = linearService.getLinearModel(model);
@@ -46,16 +59,39 @@ public class PredictService {
         String currentDirectory = System.getProperty("user.dir");
         String fileName = utils.getBaseName(testDataSet.getFileName()) + "-predicted.arff";
         Path savedPath = Paths.get(currentDirectory + "/predictedFiles/" + fileName);
-        BufferedWriter writer = new BufferedWriter(
-                new FileWriter(savedPath.toString()));
-        writer.write(labeled.toString());
-        writer.newLine();
-        writer.flush();
-        writer.close();
+        savePredictedFileToFileSys(labeled, savedPath);
 
         // save labeled data to db
         PredictedFile labeledFile = new PredictedFile(fileName, savedPath.toString(), model.getId(), testDataSet.getId());
         predictedFileService.insertPredictedFile(labeledFile);
         return labeledFile;
+    }
+
+    public PredictedFile predictKNNModel(Model model, File testDataSet) throws Exception {
+        IBk knn = knnService.getKNNModel(model);
+        // load unlabeled data
+        DataSource source = new DataSource(testDataSet.getFilePath());
+        Instances unlabeled = source.getDataSet();
+
+        // set class attribute
+        unlabeled.setClassIndex(unlabeled.numAttributes() - 1);
+
+        // Predict class labels for test instances
+        for (int i = 0; i < unlabeled.numInstances(); i++) {
+            double pred = knn.classifyInstance(unlabeled.instance(i));
+            System.out.println("Actual: " + unlabeled.instance(i).classValue() + " Predicted: " + pred);
+        }
+
+//        // save labeled data to fileSys
+//        String currentDirectory = System.getProperty("user.dir");
+//        String fileName = utils.getBaseName(testDataSet.getFileName()) + "-predicted.arff";
+//        Path savedPath = Paths.get(currentDirectory + "/predictedFiles/" + fileName);
+//        savePredictedFileToFileSys(labeled, savedPath.toString());
+//
+//        // save labeled data to db
+//        PredictedFile labeledFile = new PredictedFile(fileName, savedPath.toString(), model.getId(), testDataSet.getId());
+//        predictedFileService.insertPredictedFile(labeledFile);
+//        return labeledFile;
+        return null;
     }
 }

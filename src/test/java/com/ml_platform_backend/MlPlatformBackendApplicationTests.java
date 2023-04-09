@@ -2,10 +2,7 @@ package com.ml_platform_backend;
 
 import com.ml_platform_backend.entry.File;
 import com.ml_platform_backend.entry.Model;
-import com.ml_platform_backend.service.FileService;
-import com.ml_platform_backend.service.LinearService;
-import com.ml_platform_backend.service.ModelService;
-import com.ml_platform_backend.service.PredictService;
+import com.ml_platform_backend.service.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +13,8 @@ import java.io.FileNotFoundException;
 class MlPlatformBackendApplicationTests {
     @Autowired
     private LinearService linearService;
+    @Autowired
+    private KNNService knnService;
     @Autowired
     private FileService fileService;
     @Autowired
@@ -45,7 +44,15 @@ class MlPlatformBackendApplicationTests {
     }
 
     @Test
-    void TestgetFileJsonContentService() throws FileNotFoundException {
+    void TestKNNService() throws Exception {
+        File train = fileService.getFileById(1825833259);
+        File test = fileService.getFileById(1825833260);
+        Model model = knnService.train(train);
+        predictService.predictKNNModel(model, test);
+    }
+
+    @Test
+    void TestGetFileJsonContentService() throws FileNotFoundException {
         String json = fileService.getFileJsonContent(1825832980);
         System.out.println(json);
     }
