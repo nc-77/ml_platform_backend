@@ -9,10 +9,12 @@ import com.opencsv.exceptions.CsvValidationException;
 import org.json.CDL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
 import weka.core.converters.CSVSaver;
 import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 import weka.filters.unsupervised.instance.RemoveDuplicates;
 
 import java.io.*;
@@ -76,13 +78,54 @@ public class FileService {
         RemoveDuplicates filter = new RemoveDuplicates();
         filter.setInputFormat(data);
         Instances deduplicatedData = Filter.useFilter(data, filter);
-
-        String operation = "distinct";
         File savedFile = getNewFile(file);
 
         // 将处理后的数据集保存为CSV格式
         CSVSaver saver = new CSVSaver();
         saver.setInstances(deduplicatedData);
+        saver.setFile(new java.io.File(savedFile.getFilePath()));
+        saver.writeBatch();
+        // 保存处理后的数据集至数据库
+        insertFile(savedFile);
+
+        return savedFile;
+    }
+
+    // 处理缺失值
+    public File handleMissingValues(File file, String handleMethod) throws Exception {
+        // 读取CSV文件并将其转换为数据集对象
+        CSVLoader loader = new CSVLoader();
+        loader.setSource(new java.io.File(file.getFilePath()));
+        Instances data = loader.getDataSet();
+
+        if (handleMethod.equals("remove")) {
+            // 过滤掉含有缺失值的行
+            Instances filteredData = new Instances(data, 0); // 创建一个空的数据集
+            for (int i = 0; i < data.numInstances(); i++) {
+                Instance inst = data.instance(i);
+                boolean hasMissingValue = false;
+                for (int j = 0; j < inst.numAttributes(); j++) {
+                    if (inst.isMissing(j)) {
+                        hasMissingValue = true;
+                        break;
+                    }
+                }
+                if (!hasMissingValue) {
+                    filteredData.add(inst);
+                }
+            }
+            data = filteredData;
+        } else {
+            // 填充缺失值
+            ReplaceMissingValues filler = new ReplaceMissingValues();
+            filler.setInputFormat(data);
+            data = Filter.useFilter(data, filler);
+        }
+
+        // 将处理后的数据集保存为CSV格式
+        File savedFile = getNewFile(file);
+        CSVSaver saver = new CSVSaver();
+        saver.setInstances(data);
         saver.setFile(new java.io.File(savedFile.getFilePath()));
         saver.writeBatch();
         // 保存处理后的数据集至数据库

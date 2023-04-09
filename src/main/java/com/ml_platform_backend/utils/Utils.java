@@ -18,6 +18,11 @@ public class Utils {
         // 为fileName添加随机后缀
         String extension = fileName.substring(fileName.lastIndexOf("."));
         String randomString = UUID.randomUUID().toString().substring(0, 8);
+        // 如果fileName已经有后缀了，就替换掉
+        String lastRandomString = fileName.substring(fileName.lastIndexOf("_") + 1, fileName.lastIndexOf("."));
+        if (lastRandomString.length() == 8) {
+            return fileName.replace(lastRandomString, randomString);
+        }
         return fileName.replace(extension, "") + "_" + randomString + extension;
     }
 

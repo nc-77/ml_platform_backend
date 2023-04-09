@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class FileController {
@@ -25,13 +26,13 @@ public class FileController {
 
 
     @Data
-    static class RemoveDuplicatesReq {
+    static class FileReq {
         private Integer fileId;
     }
 
     @Data
     @AllArgsConstructor
-    static class RemoveDuplicatesResp {
+    static class FileResp {
         private Integer fileId;
         private String fileName;
     }
@@ -66,10 +67,18 @@ public class FileController {
     }
 
     @PostMapping("/files/removeDuplicates")
-    public ResponseEntity removeDuplicates(@RequestBody RemoveDuplicatesReq req) throws Exception {
+    public ResponseEntity removeDuplicates(@RequestBody FileReq req) throws Exception {
         File file = fileService.getFileById(req.fileId);
         File savedFile = fileService.removeDuplicate(file);
 
-        return new ResponseEntity(Code.SUCCESS.getValue(), new RemoveDuplicatesResp(savedFile.getId(), savedFile.getFileName()), Code.SUCCESS.getDescription());
+        return new ResponseEntity(Code.SUCCESS.getValue(), new FileResp(savedFile.getId(), savedFile.getFileName()), Code.SUCCESS.getDescription());
+    }
+
+    @PostMapping("/files/handleMissingValues")
+    public ResponseEntity handleMissingValues(@RequestBody Map<String, Object> req) throws Exception {
+        File file = fileService.getFileById((Integer) req.get("fileId"));
+        File savedFile = fileService.handleMissingValues(file, req.get("handleMethod").toString());
+
+        return new ResponseEntity(Code.SUCCESS.getValue(), new FileResp(savedFile.getId(), savedFile.getFileName()), Code.SUCCESS.getDescription());
     }
 }
