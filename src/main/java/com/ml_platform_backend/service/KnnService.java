@@ -15,13 +15,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Service
-public class KNNService {
+public class KnnService {
     @Autowired
     private Utils utils;
     @Autowired
     private ModelMapper modelMapper;
 
-    public Model train(File trainDataSet) throws Exception {
+    public Model train(File trainDataSet, Integer k) throws Exception {
         // Load dataset
         DataSource source = new DataSource(trainDataSet.getFilePath());
         Instances data = source.getDataSet();
@@ -31,6 +31,7 @@ public class KNNService {
 
         // create knn classifier
         IBk knn = new IBk();
+        knn.setKNN(k);
         // build model
         knn.buildClassifier(data);
 

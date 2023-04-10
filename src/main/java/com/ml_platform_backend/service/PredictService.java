@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import weka.classifiers.functions.LinearRegression;
 import weka.classifiers.lazy.IBk;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
@@ -24,7 +25,7 @@ public class PredictService {
     @Autowired
     private LinearService linearService;
     @Autowired
-    private KNNService knnService;
+    private KnnService knnService;
     @Autowired
     private PredictedFileService predictedFileService;
 
@@ -78,20 +79,23 @@ public class PredictService {
 
         // Predict class labels for test instances
         for (int i = 0; i < unlabeled.numInstances(); i++) {
-            double pred = knn.classifyInstance(unlabeled.instance(i));
-            System.out.println("Actual: " + unlabeled.instance(i).classValue() + " Predicted: " + pred);
+            Instance instance = unlabeled.instance(i);
+            String trueLabel = instance.stringValue(instance.classAttribute());
+            double predictedLabel = knn.classifyInstance(instance);
+            String predictedLabelString = unlabeled.classAttribute().value((int) predictedLabel);
+            unlabeled.instance(i).setClassValue(predictedLabelString);
+            //System.out.println("Actual: " + trueLabel + " Predicted: " + predictedLabelString);
         }
 
-//        // save labeled data to fileSys
-//        String currentDirectory = System.getProperty("user.dir");
-//        String fileName = utils.getBaseName(testDataSet.getFileName()) + "-predicted.arff";
-//        Path savedPath = Paths.get(currentDirectory + "/predictedFiles/" + fileName);
-//        savePredictedFileToFileSys(labeled, savedPath.toString());
-//
-//        // save labeled data to db
-//        PredictedFile labeledFile = new PredictedFile(fileName, savedPath.toString(), model.getId(), testDataSet.getId());
-//        predictedFileService.insertPredictedFile(labeledFile);
-//        return labeledFile;
-        return null;
+        // save labeled data to fileSys
+        String currentDirectory = System.getProperty("user.dir");
+        String fileName = utils.getBaseName(testDataSet.getFileName()) + "-predicted.arff";
+        Path savedPath = Paths.get(currentDirectory + "/predictedFiles/" + fileName);
+        savePredictedFileToFileSys(unlabeled, savedPath);
+
+        // save labeled data to db
+        PredictedFile labeledFile = new PredictedFile(fileName, savedPath.toString(), model.getId(), testDataSet.getId());
+        predictedFileService.insertPredictedFile(labeledFile);
+        return labeledFile;
     }
 }

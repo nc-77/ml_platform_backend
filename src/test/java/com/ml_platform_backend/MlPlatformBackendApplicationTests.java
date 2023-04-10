@@ -14,7 +14,7 @@ class MlPlatformBackendApplicationTests {
     @Autowired
     private LinearService linearService;
     @Autowired
-    private KNNService knnService;
+    private KnnService knnService;
     @Autowired
     private FileService fileService;
     @Autowired
@@ -47,7 +47,7 @@ class MlPlatformBackendApplicationTests {
     void TestKNNService() throws Exception {
         File train = fileService.getFileById(1825833259);
         File test = fileService.getFileById(1825833260);
-        Model model = knnService.train(train);
+        Model model = knnService.train(train, 3);
         predictService.predictKNNModel(model, test);
     }
 

@@ -29,8 +29,8 @@ public class PredictedFileService {
         return predictedFileMapper.selectById(id);
     }
 
-    public List<Double> getPredictedFileLabelValues(Integer id) {
-        List<Double> labelValues = new ArrayList<>();
+    public List<Object> getPredictedFileLabelValues(Integer id) {
+        List<Object> labelValues = new ArrayList<>();
         PredictedFile predictedFile = getPredictedFileById(id);
         try {
             BufferedReader reader = new BufferedReader(new FileReader(predictedFile.getFilePath()));
@@ -39,7 +39,12 @@ public class PredictedFileService {
             instances.setClassIndex(instances.numAttributes() - 1);
             for (int i = 0; i < instances.numInstances(); i++) {
                 double labelVal = instances.get(i).classValue();
-                labelValues.add(labelVal);
+                if (instances.classAttribute().isNumeric()) {
+                    labelValues.add(labelVal);
+                } else {
+                    String LabelString = instances.classAttribute().value((int) labelVal);
+                    labelValues.add(LabelString);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
