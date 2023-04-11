@@ -1,7 +1,7 @@
 package com.ml_platform_backend.controller;
 
-import com.ml_platform_backend.entry.EvalResult;
 import com.ml_platform_backend.entry.File;
+import com.ml_platform_backend.entry.LinearEvalResult;
 import com.ml_platform_backend.entry.Model;
 import com.ml_platform_backend.entry.PredictedFile;
 import com.ml_platform_backend.entry.result.Code;
@@ -62,7 +62,7 @@ public class LinearController {
         Model model = modelService.getModelById(pFile.getModelId());
         File train = fileService.getFileById(model.getFileId());
         File test = fileService.getTestFile(train.getId());
-        EvalResult evalResult = linearService.evalModel(model, train, test);
-        return new ResponseEntity(Code.SUCCESS.getValue(), evalResult, Code.SUCCESS.getDescription());
+        LinearEvalResult linearEvalResult = linearService.evalModel(model, train, test);
+        return new ResponseEntity(Code.SUCCESS.getValue(), linearEvalResult, Code.SUCCESS.getDescription());
     }
 }

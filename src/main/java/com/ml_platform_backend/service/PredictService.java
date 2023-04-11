@@ -11,6 +11,8 @@ import weka.classifiers.lazy.IBk;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.NumericToNominal;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -69,22 +71,28 @@ public class PredictService {
     }
 
     public PredictedFile predictKNNModel(Model model, File testDataSet) throws Exception {
-        IBk knn = knnService.getKNNModel(model);
+        IBk knn = knnService.getKnnModel(model);
         // load unlabeled data
         DataSource source = new DataSource(testDataSet.getFilePath());
         Instances unlabeled = source.getDataSet();
 
         // set class attribute
         unlabeled.setClassIndex(unlabeled.numAttributes() - 1);
+        // 将标签列转换为分类属性
+        NumericToNominal filter = new NumericToNominal();
+        filter.setAttributeIndices("last");
+        filter.setInputFormat(unlabeled);
+        unlabeled = Filter.useFilter(unlabeled, filter);
 
         // Predict class labels for test instances
         for (int i = 0; i < unlabeled.numInstances(); i++) {
             Instance instance = unlabeled.instance(i);
-            String trueLabel = instance.stringValue(instance.classAttribute());
             double predictedLabel = knn.classifyInstance(instance);
+            String trueLabel = instance.stringValue(instance.classAttribute());
             String predictedLabelString = unlabeled.classAttribute().value((int) predictedLabel);
             unlabeled.instance(i).setClassValue(predictedLabelString);
-            //System.out.println("Actual: " + trueLabel + " Predicted: " + predictedLabelString);
+
+            System.out.println("Actual: " + trueLabel + " Predicted: " + predictedLabelString);
         }
 
         // save labeled data to fileSys

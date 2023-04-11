@@ -1,7 +1,7 @@
 package com.ml_platform_backend.service;
 
-import com.ml_platform_backend.entry.EvalResult;
 import com.ml_platform_backend.entry.File;
+import com.ml_platform_backend.entry.LinearEvalResult;
 import com.ml_platform_backend.entry.Model;
 import com.ml_platform_backend.mapper.ModelMapper;
 import com.ml_platform_backend.utils.Utils;
@@ -32,7 +32,7 @@ public class LinearService {
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
-    private EvalResultService evalService;
+    private LinearEvalResultService evalService;
     @Autowired
     private Options options;
 
@@ -101,7 +101,7 @@ public class LinearService {
         return modelEntry;
     }
 
-    public EvalResult evalModel(Model model, File trainDataSet, File testDataSet) throws Exception {
+    public LinearEvalResult evalModel(Model model, File trainDataSet, File testDataSet) throws Exception {
         // Load dataset
         Instances train = new DataSource(trainDataSet.getFilePath()).getDataSet();
         train.setClassIndex(train.numAttributes() - 1);
@@ -113,9 +113,9 @@ public class LinearService {
         eval.evaluateModel(linearModel, test);
 
         // save evalResult to db
-        EvalResult evalResult = new EvalResult(eval.correlationCoefficient(), eval.meanAbsoluteError(), eval.rootMeanSquaredError(), eval.relativeAbsoluteError(), eval.rootRelativeSquaredError(), (int) eval.numInstances());
-        evalService.insert(evalResult);
-        return evalResult;
+        LinearEvalResult linearEvalResult = new LinearEvalResult(eval.correlationCoefficient(), eval.meanAbsoluteError(), eval.rootMeanSquaredError(), eval.relativeAbsoluteError(), eval.rootRelativeSquaredError(), (int) eval.numInstances());
+        evalService.insert(linearEvalResult);
+        return linearEvalResult;
     }
 
     public LinearRegression getLinearModel(Model model) throws IOException, ClassNotFoundException {

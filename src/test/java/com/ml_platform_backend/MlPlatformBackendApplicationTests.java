@@ -45,10 +45,11 @@ class MlPlatformBackendApplicationTests {
 
     @Test
     void TestKNNService() throws Exception {
-        File train = fileService.getFileById(1825833259);
-        File test = fileService.getFileById(1825833260);
-        Model model = knnService.train(train, 3);
+        File train = fileService.getFileById(1825833355);
+        File test = fileService.getFileById(1825833356);
+        Model model = knnService.train(train, 10);
         predictService.predictKNNModel(model, test);
+        knnService.eval(model, train, test);
     }
 
     @Test

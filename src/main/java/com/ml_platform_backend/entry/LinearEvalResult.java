@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EvalResult extends BaseEntity {
+public class LinearEvalResult extends BaseEntity {
     private double correlationCoefficient;
     private double meanAbsoluteError;
     private double rootMeanSquaredError;
