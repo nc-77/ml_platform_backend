@@ -16,11 +16,16 @@ class MlPlatformBackendApplicationTests {
     @Autowired
     private KnnService knnService;
     @Autowired
+    private LogisticService logistic;
+    @Autowired
     private FileService fileService;
     @Autowired
     private ModelService modelService;
     @Autowired
     private PredictService predictService;
+
+    @Autowired
+    private ClassifyService classifyService;
 
     @Test
     void TestLinearServiceTrain() throws Exception {
@@ -49,7 +54,16 @@ class MlPlatformBackendApplicationTests {
         File test = fileService.getFileById(1825833356);
         Model model = knnService.train(train, 10);
         predictService.predictKNNModel(model, test);
-        knnService.eval(model, train, test);
+        classifyService.eval(model, train, test);
+    }
+
+    @Test
+    void TestLogisticService() throws Exception {
+        File train = fileService.getFileById(1825833426);
+        File test = fileService.getFileById(1825833427);
+        Model model = logistic.train(train);
+        predictService.predictLogisticModel(model, test);
+        classifyService.eval(model, train, test);
     }
 
     @Test

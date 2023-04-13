@@ -13,7 +13,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName(autoResultMap = true)
-public class KnnEvalResult extends BaseEntity {
+public class ClassifyEvalResult extends BaseEntity {
     private Double pctCorrect;
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Double> precisionRate;

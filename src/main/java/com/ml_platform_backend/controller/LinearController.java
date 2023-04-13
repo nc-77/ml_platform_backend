@@ -6,11 +6,11 @@ import com.ml_platform_backend.entry.Model;
 import com.ml_platform_backend.entry.PredictedFile;
 import com.ml_platform_backend.entry.result.Code;
 import com.ml_platform_backend.entry.result.ResponseEntity;
+import com.ml_platform_backend.entry.vo.ModelTrainResp;
 import com.ml_platform_backend.service.FileService;
 import com.ml_platform_backend.service.LinearService;
 import com.ml_platform_backend.service.ModelService;
 import com.ml_platform_backend.service.PredictedFileService;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,13 +35,6 @@ public class LinearController {
     }
 
     @Data
-    @AllArgsConstructor
-    static class TrainResp {
-        private Integer modelId;
-        private String modelName;
-    }
-
-    @Data
     static class EvalReq {
         private Integer fileId;
     }
@@ -53,7 +46,7 @@ public class LinearController {
         options.setClassIndex(req.classIndex);
         linearService.setOptions(options);
         Model model = linearService.train(dataSource);
-        return new ResponseEntity(Code.SUCCESS.getValue(), new TrainResp(model.getId(), model.getModelName()), Code.SUCCESS.getDescription());
+        return new ResponseEntity(Code.SUCCESS.getValue(), new ModelTrainResp(model.getId(), model.getModelName()), Code.SUCCESS.getDescription());
     }
 
     @PostMapping("/eval/linearModel")

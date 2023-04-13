@@ -5,14 +5,14 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class KnnLabelEvalResult {
+public class ClassifyLabelEvalResult {
     private String labelName;
     private Double precisionRate;
     private Double recall;
     private Double fMeasure;
     private int numInstances;
 
-    public KnnLabelEvalResult(String labelName) {
+    public ClassifyLabelEvalResult(String labelName) {
         this.labelName = labelName;
     }
 }

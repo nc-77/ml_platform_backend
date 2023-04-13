@@ -6,7 +6,7 @@ import com.ml_platform_backend.entry.result.Code;
 import com.ml_platform_backend.entry.result.ResponseEntity;
 import com.ml_platform_backend.entry.vo.ModelTrainResp;
 import com.ml_platform_backend.service.FileService;
-import com.ml_platform_backend.service.KnnService;
+import com.ml_platform_backend.service.LogisticService;
 import com.ml_platform_backend.service.ModelService;
 import com.ml_platform_backend.service.PredictedFileService;
 import lombok.Data;
@@ -16,26 +16,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class KnnController {
-    @Autowired
-    private FileService fileService;
-    @Autowired
-    private KnnService knnService;
+public class LogisticController {
     @Autowired
     private PredictedFileService pFileService;
     @Autowired
     private ModelService modelService;
+    @Autowired
+    private FileService fileService;
+    @Autowired
+    private LogisticService logisticService;
 
     @Data
     static class TrainReq {
         private Integer fileId;
-        private Integer k;
     }
 
-    @PostMapping("/train/knn")
+    @PostMapping("/train/logistic")
     public ResponseEntity train(@RequestBody TrainReq req) throws Exception {
         File trainFile = fileService.getFileById(req.fileId);
-        Model model = knnService.train(trainFile, req.k);
+        Model model = logisticService.train(trainFile);
         return new ResponseEntity(Code.SUCCESS.getValue(), new ModelTrainResp(model.getId(), model.getModelName()), Code.SUCCESS.getDescription());
     }
 

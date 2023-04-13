@@ -1,7 +1,7 @@
 package com.ml_platform_backend.entry.vo;
 
 import com.ml_platform_backend.entry.BaseEntity;
-import com.ml_platform_backend.entry.KnnEvalResult;
+import com.ml_platform_backend.entry.ClassifyEvalResult;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -10,15 +10,15 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class KnnEvalResultResp extends BaseEntity {
+public class ClassifyEvalResultResp extends BaseEntity {
     private Double pctCorrect;
-    private List<KnnLabelEvalResult> labelEvalResults;
+    private List<ClassifyLabelEvalResult> labelEvalResults;
     private int totalNumInstances;
 
-    public KnnEvalResultResp(KnnEvalResult evalResult) {
-        List<KnnLabelEvalResult> labelEvalResults = new ArrayList<>();
+    public ClassifyEvalResultResp(ClassifyEvalResult evalResult) {
+        List<ClassifyLabelEvalResult> labelEvalResults = new ArrayList<>();
         for (String label : evalResult.getPrecisionRate().keySet()) {
-            KnnLabelEvalResult labelEvalResult = new KnnLabelEvalResult(label);
+            ClassifyLabelEvalResult labelEvalResult = new ClassifyLabelEvalResult(label);
             labelEvalResult.setPrecisionRate(evalResult.getPrecisionRate().get(label));
             labelEvalResult.setRecall(evalResult.getRecall().get(label));
             labelEvalResult.setFMeasure(evalResult.getFMeasure().get(label));

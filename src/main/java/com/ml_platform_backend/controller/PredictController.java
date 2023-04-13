@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import weka.classifiers.functions.LinearRegression;
+import weka.classifiers.functions.Logistic;
 import weka.classifiers.lazy.IBk;
 
 import java.io.IOException;
@@ -58,6 +59,9 @@ public class PredictController {
             return new ResponseEntity(Code.SUCCESS.getValue(), new respData(labeledFile.getId(), labeledFile.getFileName()), Code.SUCCESS.getDescription());
         } else if (model.getModelClass().equals(IBk.class.toString())) {
             PredictedFile labeledFile = predictService.predictKNNModel(model, testDataSet);
+            return new ResponseEntity(Code.SUCCESS.getValue(), new respData(labeledFile.getId(), labeledFile.getFileName()), Code.SUCCESS.getDescription());
+        } else if (model.getModelClass().equals(Logistic.class.toString())) {
+            PredictedFile labeledFile = predictService.predictLogisticModel(model, testDataSet);
             return new ResponseEntity(Code.SUCCESS.getValue(), new respData(labeledFile.getId(), labeledFile.getFileName()), Code.SUCCESS.getDescription());
         }
         return new ResponseEntity(Code.FAILED.getValue(), null, Code.FAILED.getDescription());
