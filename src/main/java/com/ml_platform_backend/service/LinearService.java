@@ -14,15 +14,12 @@ import org.springframework.stereotype.Service;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instances;
+import weka.core.SelectedTag;
 import weka.core.converters.ConverterUtils.DataSource;
-import weka.filters.Filter;
-import weka.filters.unsupervised.attribute.Remove;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Service
@@ -47,8 +44,10 @@ public class LinearService {
     public static class Options {
         // 标签列
         private String classIndex;
-        // 特征列
-        private String[] removeIndex;
+        // 特征选取方式
+        private Integer attributeSelectionMethod;
+        // ridge参数
+        private Double ridge;
     }
 
     public Model train(File trainDataSet) throws Exception {
@@ -56,19 +55,6 @@ public class LinearService {
         // Load dataset
         DataSource source = new DataSource(trainDataSet.getFilePath());
         Instances data = source.getDataSet();
-
-
-        // 过滤无效的特征列
-        if (options.removeIndex != null && options.removeIndex.length != 0) {
-            List<Integer> removeAttributeIndices = new ArrayList<>();
-            for (String removeIndexName : options.removeIndex) {
-                removeAttributeIndices.add(data.attribute(removeIndexName).index());
-            }
-            Remove remove = new Remove();
-            remove.setAttributeIndicesArray(removeAttributeIndices.stream().mapToInt(Integer::intValue).toArray());
-            remove.setInputFormat(data);
-            data = Filter.useFilter(data, remove);
-        }
 
 
         // 选择标签列
@@ -81,7 +67,14 @@ public class LinearService {
 
         // Build linear regression model
         LinearRegression model = new LinearRegression();
+        if (options.attributeSelectionMethod != null) {
+            model.setAttributeSelectionMethod(new SelectedTag(options.attributeSelectionMethod, LinearRegression.TAGS_SELECTION));
+        }
+        if (options.ridge != null) {
+            model.setRidge(options.ridge);
+        }
         model.buildClassifier(data);
+
 
         String modelName = utils.getBaseName(trainDataSet.getFileName()) + ".model";
         String currentDirectory = System.getProperty("user.dir");

@@ -32,6 +32,8 @@ public class LinearController {
     static class TrainReq {
         private Integer fileId;
         private String classIndex;
+        private Integer attributeSelectionMethod;
+        private Double ridge;
     }
 
     @Data
@@ -44,6 +46,8 @@ public class LinearController {
         File dataSource = fileService.getFileById(req.fileId);
         LinearService.Options options = new LinearService.Options();
         options.setClassIndex(req.classIndex);
+        options.setAttributeSelectionMethod(req.attributeSelectionMethod);
+        options.setRidge(req.ridge);
         linearService.setOptions(options);
         Model model = linearService.train(dataSource);
         return new ResponseEntity(Code.SUCCESS.getValue(), new ModelTrainResp(model.getId(), model.getModelName()), Code.SUCCESS.getDescription());
